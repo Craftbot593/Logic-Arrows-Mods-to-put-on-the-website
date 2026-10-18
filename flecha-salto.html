@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prototipo: flecha de salto</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 650px;
+      margin: 40px auto;
+      padding: 16px;
+      text-align: center;
+    }
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin: 24px 0;
+    }
+    .cell {
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      background: #e8edf3;
+      border-radius: 8px;
+      font-size: clamp(16px, 4vw, 25px);
+    }
+    .source { background: #ccebd6; }
+    .jump { background: #cfe1ff; }
+    .signal { background: #ffd66b; }
+    button, input {
+      font: inherit;
+      padding: 9px;
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Flecha de salto ⇢</h1>
+  <p>La señal salta varias casillas y llega directamente al destino.</p>
+
+  <label>
+    Distancia del salto:
+    <input id="distance" type="number"
+      min="1" max="5" value="3">
+  </label>
+
+  <div id="grid"></div>
+  <button id="run">Enviar señal</button>
+  <button id="reset">Reiniciar</button>
+  <p id="status" aria-live="polite">Listo para probar.</p>
+
+  <script>
+    const total = 7;
+    const start = 1;
+    const grid = document.querySelector("#grid");
+    const distance = document.querySelector("#distance");
+    const status = document.querySelector("#status");
+
+    function draw(destination = -1) {
+      grid.replaceChildren();
+
+      for (let i = 0; i < total; i++) {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+
+        if (i === start) {
+          cell.classList.add("source");
+          cell.textContent = "⇢";
+        } else if (i === destination) {
+          cell.classList.add("signal");
+          cell.textContent = "●";
+        } else {
+          cell.textContent = i;
+        }
+
+        grid.appendChild(cell);
+      }
+    }
+
+    document.querySelector("#run").addEventListener("click", () => {
+      const steps = Number(distance.value);
+      const destination = start + steps;
+
+      if (!Number.isInteger(steps) || steps < 1 ||
+          destination >= total) {
+        status.textContent =
+          "Elige una distancia entre 1 y 5.";
+        return;
+      }
+
+      draw(destination);
+      status.textContent =
+        "¡Salto completado! La señal llegó a la casilla " +
+        destination + ".";
+    });
+
+    document.querySelector("#reset").addEventListener("click", () => {
+      draw();
+      status.textContent = "Listo para probar.";
+    });
+
+    draw();
+  </script>
+</body>
+</html>
